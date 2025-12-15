@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple Frontend</title>
+</head>
+<body>
+  <h1>Danh sách Items</h1>
+  <button id="loadBtn">Tải dữ liệu</button>
+  <ul id="itemList"></ul>
+
+  <script>
+    const loadBtn = document.getElementById('loadBtn');
+    const itemList = document.getElementById('itemList');
+
+    loadBtn.addEventListener('click', () => {
+      fetch('http://localhost:3000/api/items')  // đổi nếu backend khác URL
+        .then(res => res.json())
+        .then(data => {
+          itemList.innerHTML = '';
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.id}: ${item.name}`;
+            itemList.appendChild(li);
+          });
+        })
+        .catch(err => {
+          itemList.innerHTML = 'Lỗi khi tải dữ liệu.';
+          console.error(err);
+        });
+    });
+  </script>
+</body>
+</html>
