@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend-app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: mysql-db
+      DB_USER: myuser
+      DB_PASS: mypassword
+      DB_NAME: mydatabase
+      PORT: 3000
+    # Thay đổi 'depends_on' thành điều kiện service_healthy
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    # Bỏ dòng 'entrypoint:' nếu bạn đã thêm vào trước đó
+
+  mysql-db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - db_data:/var/lib/mysql
+    # THÊM healthcheck này vào dịch vụ mysql-db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  db_data:
